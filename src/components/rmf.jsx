@@ -5,7 +5,42 @@ export default class Rmf extends React.Component {
     super(props);
     this.state = { content: [] };
   }
+
   render() {
+    function changeStringToMulti(input) {
+      var isLength = input.length;
+      var startNumber = 0;
+      if (Number(input.charAt(0)) === 0) {
+        startNumber = 1;
+      }
+      var dataArray = [];
+      for (startNumber; startNumber < isLength; startNumber++) {
+        var stringForTransport;
+        if (input.charAt(startNumber) === " ") {
+          dataArray.push(stringForTransport);
+          stringForTransport = null;
+        } else {
+          if (stringForTransport === null) {
+            stringForTransport = input.charAt(startNumber);
+          } else {
+            stringForTransport += input.charAt(startNumber);
+          }
+        }
+      }
+      var finalArray = [];
+      for (var j = 0; j < dataArray.length; j++) {
+        if (dataArray[j] === null) {
+        } else {
+          finalArray.push(dataArray[j]);
+        }
+      }
+      var lastArray = [];
+      var substring = finalArray[0].substr(9);
+      var helpstring = '{"' + substring + '": "' + finalArray[4] + '"}';
+
+      lastArray.push(helpstring);
+      console.log(JSON.parse(lastArray));
+    }
     const ImportFromFileBodyComponent = () => {
       let fileReader;
 
@@ -19,7 +54,11 @@ export default class Rmf extends React.Component {
         var end = result.indexOf(
           "            ------                                        ------------  ------------                          -----      -----  -----"
         );
-        var emptyArray = [];
+        for (var k = begin + 1; k < end - 1; k++) {
+          changeStringToMulti(result[k]);
+        }
+
+        /*var emptyArray = [];
         for (var i = begin; i < end; i++) {
           emptyArray.push(result[i]);
         }
@@ -27,7 +66,7 @@ export default class Rmf extends React.Component {
           <li className="list-group-item">{value}</li>
         ));
         var fullTable = <ul className="list-group">{table}</ul>;
-        this.setState({ content: fullTable });
+        this.setState({ content: fullTable });*/
       };
 
       const handleFileChosen = file => {
