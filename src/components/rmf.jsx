@@ -1,5 +1,5 @@
 import React from "react";
-
+var url = "http://localhost:4001/";
 export default class Rmf extends React.Component {
   constructor(props) {
     super(props);
@@ -7,6 +7,39 @@ export default class Rmf extends React.Component {
   }
 
   render() {
+    function checkServer(machine) {
+      var xhr = new XMLHttpRequest();
+      xhr.open("GET", url + machine, true);
+      xhr.onload = function() {
+        if (xhr.readyState === 4 && xhr.status === "200") {
+          return true;
+        } else {
+          return false;
+        }
+      };
+      xhr.send(null);
+    }
+    function createTableInDb(machine) {
+      if (checkServer(machine)) {
+        console.log("The machine already exists");
+      } else {
+        var data = {};
+        data.Name = machine;
+        var json = JSON.stringify(data);
+        console.log(json);
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", url + machine, true);
+        xhr.onload = function() {
+          if (xhr.readyState === 4 && xhr.status === "200") {
+            console.log(xhr.responseText);
+          } else {
+            console.error("error on creating machine");
+          }
+        };
+        xhr.send(json);
+        console.log("machine needs to be created");
+      }
+    }
     function changeStringToMulti(
       input,
       startDate,
@@ -83,7 +116,7 @@ export default class Rmf extends React.Component {
           systemIdRow.search("SYSTEM ID") + 10,
           systemIdRow.search("START")
         );
-        console.log(systemId);
+        createTableInDb(systemId);
         while (
           result.indexOf(
             "1                                                       C P U  A C T I V I T Y"
