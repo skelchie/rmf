@@ -22,8 +22,17 @@ app.get("/", (req, res, next) => {
   res.send("Welcome to the server!");
 });
 
-app.get("/:machines", (req, res, next) => {
-  var machine = req.params.machines;
+app.get("/data", (req, res, next) => {
+  var machineArray = machines.map(value => value.Name);
+
+  if (machineArray !== []) {
+    res.status(200).send(machineArray);
+  } else {
+    res.status(400).send("No Machines found");
+  }
+});
+app.get("/machines/:id", (req, res, next) => {
+  var machine = req.params.id;
   var machineArray = machines.map(value => value.Name);
   var position = machineArray.indexOf(machine);
 
@@ -34,11 +43,38 @@ app.get("/:machines", (req, res, next) => {
   }
 });
 
-app.put("/:machines", (req, res, next) => {
-  var machine = req.params.machines;
+app.put("/machines/:id", (req, res, next) => {
+  var machine = req.params.id;
   createTableInDb(machine);
   insertIntoTable(machine, "Machines");
   res.status(200).send("Machine has been inserted");
+});
+
+app.put("/data/:machines", (req, res, next) => {
+  var startDate = req.query.startDate;
+  var startTime = req.query.startTime;
+  var endTime = req.query.endTime;
+  var lpar = req.query.lpar;
+  var machine = req.params.machines;
+  var usage = req.query.usage;
+  console.log({ machine, lpar, usage, startDate, startTime, endTime });
+  const db = new sqlite3.Database(database);
+  db.run(
+    `INSERT INTO ${machine}(lpar, usage, startDate, startTime, endTime) VALUES (?,?,?,?,?)`,
+    [lpar, usage, startDate, startTime, endTime],
+
+    function(err) {
+      if (err) {
+        return console.log(err.message);
+      } else {
+        [lpar, startDate, startTime, endTime] +
+          " has been inserted into " +
+          machine;
+      }
+      res.status(200).send("Data has been inserted");
+    }
+  );
+  db.close;
 });
 // Invoke the app's `.listen()` method below:
 app.listen(PORT, () => {
@@ -60,11 +96,14 @@ function getMachinesFromDb() {
 
 function createTableInDb(newTable) {
   const db = new sqlite3.Database(database);
-  db.run(`CREATE TABLE ${newTable} VALUES (?)`, ["LPAR string"], function(err) {
-    if (err) {
-      return console.log(err.message);
+  db.run(
+    `CREATE TABLE ${newTable} (lpar STRING, usage STRING, startDate STRING, startTime STRING, endTime STRING)`,
+    function(err) {
+      if (err) {
+        return console.log(err.message);
+      }
     }
-  });
+  );
   db.close;
 }
 
@@ -78,7 +117,6 @@ function insertIntoTable(value, table) {
       value + " has been inserted into " + table;
     }
     // get the last insert id
-    console.log(`A row has been inserted with rowid ${this.lastID}`);
     machines = getMachinesFromDb();
   });
   db.close;
