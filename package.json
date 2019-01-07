@@ -4,13 +4,17 @@
   "private": true,
   "dependencies": {
     "bootstrap": "^4.2.1",
+    "chart.js": "^2.7.3",
     "jquery": "^3.3.1",
     "popper.js": "^1.14.6",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
     "react-scripts": "2.1.2",
     "readline": "^1.3.0",
+<<<<<<< HEAD
     "request": "^2.88.0",
+=======
+>>>>>>> 62fc9eba894cf1f8b5ec0150a7e3290a926a031c
     "sqlite3": "^4.0.4"
   },
   "scripts": {
